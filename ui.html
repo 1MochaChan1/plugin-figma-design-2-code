@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
+      font-size: 12px;
+      color: #333;
+      padding: 16px;
+      background: #fff;
+    }
+
+    h3 {
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #111;
+    }
+
+    label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      margin-bottom: 4px;
+      color: #555;
+    }
+
+    input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d1d1d1;
+      border-radius: 6px;
+      font-size: 11px;
+      margin-bottom: 12px;
+      outline: none;
+      transition: border-color 0.15s;
+    }
+
+    input:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #7c3aed;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+
+    button:hover {
+      background: #6d28d9;
+    }
+
+    button:disabled {
+      background: #d1d5db;
+      cursor: not-allowed;
+    }
+
+    #status {
+      margin-top: 12px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      font-size: 11px;
+      display: none;
+    }
+
+    #status.loading {
+      display: block;
+      background: #f3f4f6;
+      color: #6b7280;
+    }
+
+    #status.success {
+      display: block;
+      background: #ecfdf5;
+      color: #065f46;
+    }
+
+    #status.error {
+      display: block;
+      background: #fef2f2;
+      color: #991b1b;
+    }
+
+    .hint {
+      font-size: 10px;
+      color: #9ca3af;
+      margin-top: -8px;
+      margin-bottom: 12px;
+    }
+
+    select {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #d1d1d1;
+      border-radius: 6px;
+      font-size: 11px;
+      margin-bottom: 12px;
+      outline: none;
+      background: #fff;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+
+    select:focus {
+      border-color: #7c3aed;
+      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+    }
+
+    .row {
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+    }
+
+    .row > div {
+      flex: 1;
+    }
+
+    .divider {
+      border-top: 1px solid #e5e7eb;
+      margin: 16px 0;
+    }
+  </style>
+</head>
+<body>
+  <h3>D2C Figma — Generate Code</h3>
+
+  <label for="repoPath">Client Repository Path</label>
+  <input
+    type="text"
+    id="repoPath"
+    placeholder="C:\Users\...\my-react-app"
+  />
+  <div class="hint">
+    Absolute path to repo root (must contain .ai-project-context.md)
+  </div>
+
+  <div class="row">
+    <div>
+      <label for="framework">Framework</label>
+      <select id="framework">
+        <option value="auto">Auto-detect</option>
+        <option value="react">React</option>
+        <option value="vue">Vue</option>
+        <option value="svelte">Svelte</option>
+        <option value="angular">Angular</option>
+        <option value="flutter">Flutter</option>
+        <option value="swiftui">SwiftUI</option>
+        <option value="compose">Jetpack Compose</option>
+        <option value="generic">Generic</option>
+      </select>
+    </div>
+  </div>
+
+  <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; cursor: pointer;">
+    <input type="checkbox" id="includeScreenshot" checked style="width: auto; margin: 0;" />
+    <span>Include screenshot</span>
+  </label>
+  <div class="hint" style="margin-top: -4px; margin-bottom: 12px;">
+    Some models may not accept images depending on the provider you're using.
+  </div>
+
+  <button id="generateBtn" onclick="onGenerate()">Generate</button>
+
+  <div class="divider"></div>
+
+  <label for="serverUrl">Bridge Server</label>
+  <input
+    type="text"
+    id="serverUrl"
+    value="http://localhost:3000/compile"
+  />
+
+  <div id="status"></div>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const generateBtn = document.getElementById("generateBtn");
+
+    function setStatus(type, message) {
+      statusEl.className = type;
+      statusEl.textContent = message;
+      statusEl.style.display = "block";
+    }
+
+    function hideStatus() {
+      statusEl.style.display = "none";
+    }
+
+    function onGenerate() {
+      const repoPath = document.getElementById("repoPath").value.trim();
+      const includeScreenshot = document.getElementById("includeScreenshot").checked;
+      const framework = document.getElementById("framework").value;
+      console.log("[D2C UI] Generate clicked. Repo:", repoPath, "| Screenshot:", includeScreenshot, "| Framework:", framework);
+
+      if (!repoPath) {
+        setStatus("error", "Please enter a client repository path.");
+        return;
+      }
+
+      generateBtn.disabled = true;
+      setStatus("loading", includeScreenshot ? "Extracting design + screenshot..." : "Extracting design data...");
+
+      parent.postMessage(
+        { pluginMessage: { type: "generate", clientRepoPath: repoPath, includeScreenshot: includeScreenshot, framework: framework } },
+        "*"
+      );
+    }
+
+    window.onmessage = async (event) => {
+      const msg = event.data.pluginMessage;
+      if (!msg) return;
+
+      console.log("[D2C UI] Received message:", msg.type);
+
+      switch (msg.type) {
+        case "status":
+          console.log("[D2C UI] Status:", msg.message);
+          setStatus("loading", msg.message);
+          break;
+
+        case "error":
+          console.error("[D2C UI] Error:", msg.message);
+          setStatus("error", msg.message);
+          generateBtn.disabled = false;
+          break;
+
+        case "compile":
+          console.log("[D2C UI] Blueprint size:", msg.penBlueprint.length, "chars | Screenshot:", msg.screenshotBase64 ? msg.screenshotBase64.length : "skipped");
+          setStatus("loading", "Sending to bridge server...");
+          await sendToBridge(msg);
+          break;
+      }
+    };
+
+    async function sendToBridge(msg) {
+      const serverUrl =
+        document.getElementById("serverUrl").value.trim() ||
+        "http://localhost:3000/compile";
+
+      console.log("[D2C UI] POSTing to:", serverUrl);
+
+      try {
+        const body = {
+          clientRepoPath: msg.clientRepoPath,
+          penBlueprint: JSON.parse(msg.penBlueprint),
+          framework: msg.framework || "auto",
+        };
+        if (msg.screenshotBase64) {
+          body.screenshotBase64 = msg.screenshotBase64;
+        }
+
+        const response = await fetch(serverUrl, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(body),
+        });
+
+        const result = await response.json();
+        console.log("[D2C UI] Response:", response.status, result);
+
+        if (!response.ok) {
+          setStatus(
+            "error",
+            result.error || `Server error: ${response.status}`
+          );
+        } else {
+          setStatus(
+            "success",
+            `Generated ${result.count} file(s):\n${result.filesWritten
+              .map((f) => "  - " + f)
+              .join("\n")}`
+          );
+        }
+      } catch (err) {
+        console.error("[D2C UI] Fetch error:", err);
+        setStatus(
+          "error",
+          "Failed to connect to bridge server. Is it running?"
+        );
+      } finally {
+        generateBtn.disabled = false;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "name": "D2C Figma",
+  "id": "d2c-figma",
+  "api": "1.0.0",
+  "main": "code.js",
+  "ui": "ui.html",
+  "editorType": ["figma"],
+  "networkAccess": {
+    "allowedDomains": ["http://localhost:3000"],
+    "devAllowedDomains": ["http://localhost:3000"],
+    "reasoning": "The plugin sends design data to a local bridge server for code generation."
+  }
+}
