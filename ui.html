@@ -96,6 +96,32 @@
       color: #991b1b;
     }
 
+    #warnings {
+      margin-top: 12px;
+      padding: 10px;
+      border-radius: 6px;
+      background: #fffbeb;
+      border: 1px solid #fcd34d;
+      color: #92400e;
+      font-size: 11px;
+      display: none;
+    }
+
+    #warnings h4 {
+      margin: 0 0 6px 0;
+      font-size: 11px;
+      font-weight: 600;
+    }
+
+    #warnings ul {
+      margin: 0;
+      padding-left: 16px;
+    }
+
+    #warnings li {
+      margin-bottom: 4px;
+    }
+
     .hint {
       font-size: 10px;
       color: #9ca3af;
@@ -177,6 +203,17 @@
 
   <button id="generateBtn" onclick="onGenerate()">Generate</button>
 
+  <!-- <button
+    id="testSseBtn"
+    onclick="onTestSSE()"
+    style="margin-top: 8px; background: #4b5563;"
+  >
+    Test SSE Stream (60s)
+  </button>
+  <div class="hint" style="margin-top: -4px;">
+    Diagnostic: checks if Figma can hold an EventSource connection.
+  </div> -->
+
   <div class="divider"></div>
 
   <label for="serverUrl">Bridge Server</label>
@@ -187,9 +224,15 @@
   />
 
   <div id="status"></div>
+  <div id="warnings">
+    <h4>Assets to export manually</h4>
+    <ul id="warningsList"></ul>
+  </div>
 
   <script>
     const statusEl = document.getElementById("status");
+    const warningsEl = document.getElementById("warnings");
+    const warningsListEl = document.getElementById("warningsList");
     const generateBtn = document.getElementById("generateBtn");
 
     function setStatus(type, message) {
@@ -200,6 +243,78 @@
 
     function hideStatus() {
       statusEl.style.display = "none";
+    }
+
+    function renderWarnings(warnings) {
+      if (!warnings || warnings.length === 0) {
+        warningsEl.style.display = "none";
+        return;
+      }
+
+      warningsListEl.innerHTML = warnings
+        .map((w) => `<li>${escapeHtml(w)}</li>`)
+        .join("");
+      warningsEl.style.display = "block";
+    }
+
+    function hideWarnings() {
+      warningsEl.style.display = "none";
+      warningsListEl.innerHTML = "";
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement("div");
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    function onTestSSE() {
+      const serverUrl =
+        document.getElementById("serverUrl").value.trim() ||
+        "http://localhost:3000";
+      const testUrl = serverUrl.replace(/\/compile\/?$/, "") + "/compile/echo-sse";
+
+      console.log("[D2C UI] Testing EventSource:", testUrl);
+      setStatus("loading", "Connecting EventSource test stream...");
+
+      const es = new EventSource(testUrl);
+      let lastEventAt = Date.now();
+      let eventCount = 0;
+
+      es.onopen = () => {
+        console.log("[D2C UI] EventSource opened");
+      };
+
+      const handleTestEvent = (eventName, data) => {
+        eventCount++;
+        lastEventAt = Date.now();
+        console.log("[D2C UI] EventSource " + eventName + " #" + eventCount + ":", data);
+
+        if (data.message) {
+          setStatus("loading", "SSE test: " + data.message + " (#" + eventCount + ")");
+        } else if (data.chars !== undefined) {
+          setStatus("loading", "SSE test: " + data.chars + " chars (#" + eventCount + ")");
+        } else if (data.success) {
+          setStatus("success", "SSE test survived 60s! (" + eventCount + " events)");
+          es.close();
+        }
+      };
+
+      es.addEventListener("status", (e) => handleTestEvent("status", JSON.parse(e.data)));
+      es.addEventListener("token", (e) => handleTestEvent("token", JSON.parse(e.data)));
+      es.addEventListener("done", (e) => handleTestEvent("done", JSON.parse(e.data)));
+
+      es.onerror = (e) => {
+        setTimeout(() => {
+          const elapsed = Date.now() - lastEventAt;
+          console.error("[D2C UI] EventSource error after", elapsed, "ms", e);
+          setStatus(
+            "error",
+            "EventSource failed after " + elapsed + "ms (" + eventCount + " events received)",
+          );
+          es.close();
+        }, 500);
+      };
     }
 
     function onGenerate() {
@@ -214,6 +329,7 @@
       }
 
       generateBtn.disabled = true;
+      hideWarnings();
       setStatus("loading", includeScreenshot ? "Extracting design + screenshot..." : "Extracting design data...");
 
       parent.postMessage(
@@ -252,8 +368,24 @@
       const serverUrl =
         document.getElementById("serverUrl").value.trim() ||
         "http://localhost:3000/compile";
+      const baseUrl = serverUrl.replace(/\/compile\/?$/, "");
+      const startUrl = baseUrl + "/compile/start";
+      const streamUrlBase = baseUrl + "/compile/stream/";
 
-      console.log("[D2C UI] POSTing to:", serverUrl);
+      console.log("[D2C UI] POSTing to:", startUrl);
+
+      let currentStatus = "Generating code...";
+      let currentChars = 0;
+      let finalResult = null;
+
+      function updateLoadingStatus() {
+        setStatus(
+          "loading",
+          currentChars > 0
+            ? `${currentStatus} (${currentChars.toLocaleString()} chars)`
+            : currentStatus,
+        );
+      }
 
       try {
         const body = {
@@ -265,35 +397,130 @@
           body.screenshotBase64 = msg.screenshotBase64;
         }
 
-        const response = await fetch(serverUrl, {
+        const startResponse = await fetch(startUrl, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(body),
         });
 
-        const result = await response.json();
-        console.log("[D2C UI] Response:", response.status, result);
+        console.log("[D2C UI] start response:", {
+          status: startResponse.status,
+          statusText: startResponse.statusText,
+        });
 
-        if (!response.ok) {
-          setStatus(
-            "error",
-            result.error || `Server error: ${response.status}`
-          );
-        } else {
-          setStatus(
-            "success",
-            `Generated ${result.count} file(s):\n${result.filesWritten
-              .map((f) => "  - " + f)
-              .join("\n")}`
-          );
+        if (!startResponse.ok) {
+          const text = await startResponse.text();
+          let errorMessage = `Server error: ${startResponse.status}`;
+          try {
+            const result = JSON.parse(text);
+            errorMessage = result.error || result.message || errorMessage;
+          } catch (e) {
+            // ignore parse error
+          }
+          setStatus("error", errorMessage);
+          generateBtn.disabled = false;
+          return;
         }
+
+        const { jobId } = await startResponse.json();
+        console.log("[D2C UI] Job started:", jobId);
+
+        currentStatus = "Connected. Waiting for model...";
+        updateLoadingStatus();
+
+        const streamUrl = streamUrlBase + jobId;
+        console.log("[D2C UI] Connecting EventSource:", streamUrl);
+
+        const es = new EventSource(streamUrl);
+        let lastEventAt = Date.now();
+        let eventCount = 0;
+
+        const handleEvent = (eventName, data) => {
+          eventCount++;
+          lastEventAt = Date.now();
+          console.log(`[D2C UI] EventSource '${eventName}':`, data);
+
+          switch (eventName) {
+            case "status":
+              currentStatus = data.message || currentStatus;
+              updateLoadingStatus();
+              break;
+
+            case "token":
+              currentChars = data.chars || currentChars;
+              updateLoadingStatus();
+              break;
+
+            case "turn-complete":
+              currentStatus = `Turn ${data.turn} complete — ${data.filesSoFar} file(s)`;
+              updateLoadingStatus();
+              break;
+
+            case "files-written":
+              currentStatus = `Wrote ${data.count} file(s)`;
+              updateLoadingStatus();
+              break;
+
+            case "warnings":
+              renderWarnings(data.messages);
+              break;
+
+            case "done":
+              finalResult = data;
+              if (finalResult.success) {
+                console.log("[D2C UI] Final result:", finalResult);
+                setStatus(
+                  "success",
+                  `Generated ${finalResult.count} file(s):\n${finalResult.filesWritten
+                    .map((f) => "  - " + f)
+                    .join("\n")}`,
+                );
+                generateBtn.disabled = false;
+                es.close();
+              }
+              break;
+          }
+        };
+
+        es.addEventListener("status", (e) => handleEvent("status", JSON.parse(e.data)));
+        es.addEventListener("token", (e) => handleEvent("token", JSON.parse(e.data)));
+        es.addEventListener("turn-complete", (e) => handleEvent("turn-complete", JSON.parse(e.data)));
+        es.addEventListener("files-written", (e) => handleEvent("files-written", JSON.parse(e.data)));
+        es.addEventListener("warnings", (e) => handleEvent("warnings", JSON.parse(e.data)));
+        es.addEventListener("done", (e) => handleEvent("done", JSON.parse(e.data)));
+        es.addEventListener("error", (e) => {
+          // EventSource fires generic error events when connection closes.
+          // Wait briefly to see if a 'done' event already set finalResult.
+          setTimeout(() => {
+            if (finalResult && finalResult.success) {
+              console.log("[D2C UI] Stream closed after successful done");
+              return;
+            }
+            const elapsed = Date.now() - lastEventAt;
+            let errorMessage = `Stream error after ${elapsed}ms (${eventCount} events received)`;
+            try {
+              const data = JSON.parse(e.data);
+              errorMessage = data.message || data.error || errorMessage;
+            } catch (parseErr) {
+              // ignore parse error
+            }
+            console.error("[D2C UI] EventSource error after", elapsed, "ms", e);
+            setStatus("error", errorMessage);
+            generateBtn.disabled = false;
+            es.close();
+          }, 500);
+        });
+
+        es.onopen = () => {
+          console.log("[D2C UI] EventSource opened");
+        };
       } catch (err) {
-        console.error("[D2C UI] Fetch error:", err);
+        console.error("[D2C UI] Compile error:", err);
+        console.error("[D2C UI] Error stack:", err.stack);
         setStatus(
           "error",
-          "Failed to connect to bridge server. Is it running?"
+          err.message || "Failed to connect to bridge server. Is it running?",
         );
-      } finally {
         generateBtn.disabled = false;
       }
     }

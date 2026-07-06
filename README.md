@@ -21,13 +21,21 @@ Figma plugin that extracts design data from your Figma frames and sends it to th
 The plugin will:
 1. Extract design data into a structured "Pen Blueprint" JSON
 2. Capture a 2x PNG screenshot (if enabled)
-3. Send both to the bridge server at `http://localhost:3000/compile`
+3. POST to `http://localhost:3000/compile/start` to create a compile job
+4. Open an `EventSource` connection to `http://localhost:3000/compile/stream/:jobId`
+5. Stream live progress (status messages + token counter) back to the UI
+6. Write the generated files to your client repository
+
+## Streaming
+
+The plugin uses native browser `EventSource` to receive live progress events from the bridge server. This avoids Figma's long-request timeout issues and lets you see a running token counter while the LLM generates code.
 
 ## Requirements
 
 - Figma Desktop app
 - Bridge server running locally (`d2c-figma/bridge-server`)
 - `.ai-project-context.md` in the target repository root
+- Browser/EventSource support (provided by Figma's plugin iframe)
 
 ## Files
 
