@@ -1,209 +1,222 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-  <meta charset="utf-8" />
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    body {
-      font-family: Inter, -apple-system, BlinkMacSystemFont, sans-serif;
-      font-size: 12px;
-      color: #333;
-      padding: 16px;
-      background: #fff;
-    }
+      body {
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          sans-serif;
+        font-size: 12px;
+        color: #333;
+        padding: 16px;
+        background: #fff;
+      }
 
-    h3 {
-      font-size: 13px;
-      font-weight: 600;
-      margin-bottom: 12px;
-      color: #111;
-    }
+      h3 {
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 12px;
+        color: #111;
+      }
 
-    label {
-      display: block;
-      font-size: 11px;
-      font-weight: 500;
-      margin-bottom: 4px;
-      color: #555;
-    }
+      label {
+        display: block;
+        font-size: 11px;
+        font-weight: 500;
+        margin-bottom: 4px;
+        color: #555;
+      }
 
-    input {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #d1d1d1;
-      border-radius: 6px;
-      font-size: 11px;
-      margin-bottom: 12px;
-      outline: none;
-      transition: border-color 0.15s;
-    }
+      input {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #d1d1d1;
+        border-radius: 6px;
+        font-size: 11px;
+        margin-bottom: 12px;
+        outline: none;
+        transition: border-color 0.15s;
+      }
 
-    input:focus {
-      border-color: #7c3aed;
-      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
-    }
+      input:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+      }
 
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #7c3aed;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.15s;
-    }
+      button {
+        width: 100%;
+        padding: 10px;
+        background: #7c3aed;
+        color: #fff;
+        border: none;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.15s;
+      }
 
-    button:hover {
-      background: #6d28d9;
-    }
+      button:hover {
+        background: #6d28d9;
+      }
 
-    button:disabled {
-      background: #d1d5db;
-      cursor: not-allowed;
-    }
+      button:disabled {
+        background: #d1d5db;
+        cursor: not-allowed;
+      }
 
-    #status {
-      margin-top: 12px;
-      padding: 8px 10px;
-      border-radius: 6px;
-      font-size: 11px;
-      display: none;
-    }
+      #status {
+        margin-top: 12px;
+        padding: 8px 10px;
+        border-radius: 6px;
+        font-size: 11px;
+        display: none;
+      }
 
-    #status.loading {
-      display: block;
-      background: #f3f4f6;
-      color: #6b7280;
-    }
+      #status.loading {
+        display: block;
+        background: #f3f4f6;
+        color: #6b7280;
+      }
 
-    #status.success {
-      display: block;
-      background: #ecfdf5;
-      color: #065f46;
-    }
+      #status.success {
+        display: block;
+        background: #ecfdf5;
+        color: #065f46;
+      }
 
-    #status.error {
-      display: block;
-      background: #fef2f2;
-      color: #991b1b;
-    }
+      #status.error {
+        display: block;
+        background: #fef2f2;
+        color: #991b1b;
+      }
 
-    #warnings {
-      margin-top: 12px;
-      padding: 10px;
-      border-radius: 6px;
-      background: #fffbeb;
-      border: 1px solid #fcd34d;
-      color: #92400e;
-      font-size: 11px;
-      display: none;
-    }
+      #warnings {
+        margin-top: 12px;
+        padding: 10px;
+        border-radius: 6px;
+        background: #fffbeb;
+        border: 1px solid #fcd34d;
+        color: #92400e;
+        font-size: 11px;
+        display: none;
+      }
 
-    #warnings h4 {
-      margin: 0 0 6px 0;
-      font-size: 11px;
-      font-weight: 600;
-    }
+      #warnings h4 {
+        margin: 0 0 6px 0;
+        font-size: 11px;
+        font-weight: 600;
+      }
 
-    #warnings ul {
-      margin: 0;
-      padding-left: 16px;
-    }
+      #warnings ul {
+        margin: 0;
+        padding-left: 16px;
+      }
 
-    #warnings li {
-      margin-bottom: 4px;
-    }
+      #warnings li {
+        margin-bottom: 4px;
+      }
 
-    .hint {
-      font-size: 10px;
-      color: #9ca3af;
-      margin-top: -8px;
-      margin-bottom: 12px;
-    }
+      .hint {
+        font-size: 10px;
+        color: #9ca3af;
+        margin-top: -8px;
+        margin-bottom: 12px;
+      }
 
-    select {
-      width: 100%;
-      padding: 8px 10px;
-      border: 1px solid #d1d1d1;
-      border-radius: 6px;
-      font-size: 11px;
-      margin-bottom: 12px;
-      outline: none;
-      background: #fff;
-      cursor: pointer;
-      transition: border-color 0.15s;
-    }
+      select {
+        width: 100%;
+        padding: 8px 10px;
+        border: 1px solid #d1d1d1;
+        border-radius: 6px;
+        font-size: 11px;
+        margin-bottom: 12px;
+        outline: none;
+        background: #fff;
+        cursor: pointer;
+        transition: border-color 0.15s;
+      }
 
-    select:focus {
-      border-color: #7c3aed;
-      box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
-    }
+      select:focus {
+        border-color: #7c3aed;
+        box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
+      }
 
-    .row {
-      display: flex;
-      gap: 12px;
-      align-items: flex-end;
-    }
+      .row {
+        display: flex;
+        gap: 12px;
+        align-items: flex-end;
+      }
 
-    .row > div {
-      flex: 1;
-    }
+      .row > div {
+        flex: 1;
+      }
 
-    .divider {
-      border-top: 1px solid #e5e7eb;
-      margin: 16px 0;
-    }
-  </style>
-</head>
-<body>
-  <h3>D2C Figma — Generate Code</h3>
+      .divider {
+        border-top: 1px solid #e5e7eb;
+        margin: 16px 0;
+      }
+    </style>
+  </head>
+  <body>
+    <h3>D2C Figma — Generate Code</h3>
 
-  <label for="repoPath">Client Repository Path</label>
-  <input
-    type="text"
-    id="repoPath"
-    placeholder="C:\Users\...\my-react-app"
-  />
-  <div class="hint">
-    Absolute path to repo root (must contain .ai-project-context.md)
-  </div>
-
-  <div class="row">
-    <div>
-      <label for="framework">Framework</label>
-      <select id="framework">
-        <option value="auto">Auto-detect</option>
-        <option value="react">React</option>
-        <option value="vue">Vue</option>
-        <option value="svelte">Svelte</option>
-        <option value="angular">Angular</option>
-        <option value="flutter">Flutter</option>
-        <option value="swiftui">SwiftUI</option>
-        <option value="compose">Jetpack Compose</option>
-        <option value="generic">Generic</option>
-      </select>
+    <label for="repoPath">Client Repository Path</label>
+    <input type="text" id="repoPath" placeholder="C:\Users\...\my-react-app" />
+    <div class="hint">
+      Absolute path to repo root (must contain .ai-project-context.md)
     </div>
-  </div>
 
-  <label style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px; cursor: pointer;">
-    <input type="checkbox" id="includeScreenshot" checked style="width: auto; margin: 0;" />
-    <span>Include screenshot</span>
-  </label>
-  <div class="hint" style="margin-top: -4px; margin-bottom: 12px;">
-    Some models may not accept images depending on the provider you're using.
-  </div>
+    <div class="row">
+      <div>
+        <label for="framework">Framework</label>
+        <select id="framework">
+          <option value="auto">Auto-detect</option>
+          <option value="react">React</option>
+          <option value="vue">Vue</option>
+          <option value="svelte">Svelte</option>
+          <option value="angular">Angular</option>
+          <option value="flutter">Flutter</option>
+          <option value="swiftui">SwiftUI</option>
+          <option value="compose">Jetpack Compose</option>
+          <option value="generic">Generic</option>
+        </select>
+      </div>
+    </div>
 
-  <button id="generateBtn" onclick="onGenerate()">Generate</button>
+    <label
+      style="
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 4px;
+        cursor: pointer;
+      "
+    >
+      <input
+        type="checkbox"
+        id="includeScreenshot"
+        checked
+        style="width: auto; margin: 0"
+      />
+      <span>Include screenshot</span>
+    </label>
+    <div class="hint" style="margin-top: -4px; margin-bottom: 12px">
+      Some models may not accept images depending on the provider you're using.
+    </div>
 
-  <!-- <button
+    <button id="generateBtn" onclick="onGenerate()">Generate</button>
+
+    <!-- <button
     id="testSseBtn"
     onclick="onTestSSE()"
     style="margin-top: 8px; background: #4b5563;"
@@ -214,264 +227,316 @@
     Diagnostic: checks if Figma can hold an EventSource connection.
   </div> -->
 
-  <div class="divider"></div>
+    <div class="divider"></div>
 
-  <label for="serverUrl">Bridge Server</label>
-  <input
-    type="text"
-    id="serverUrl"
-    value="http://localhost:3000/compile"
-  />
+    <label for="serverUrl">Bridge Server</label>
+    <input type="text" id="serverUrl" value="http://localhost:3000/compile" />
 
-  <div id="status"></div>
-  <div id="warnings">
-    <h4>Assets to export manually</h4>
-    <ul id="warningsList"></ul>
-  </div>
+    <div id="status"></div>
+    <div id="warnings">
+      <h4>Assets to export manually</h4>
+      <ul id="warningsList"></ul>
+    </div>
 
-  <script>
-    const statusEl = document.getElementById("status");
-    const warningsEl = document.getElementById("warnings");
-    const warningsListEl = document.getElementById("warningsList");
-    const generateBtn = document.getElementById("generateBtn");
+    <script>
+      const statusEl = document.getElementById("status");
+      const warningsEl = document.getElementById("warnings");
+      const warningsListEl = document.getElementById("warningsList");
+      const generateBtn = document.getElementById("generateBtn");
 
-    function setStatus(type, message) {
-      statusEl.className = type;
-      statusEl.textContent = message;
-      statusEl.style.display = "block";
-    }
-
-    function hideStatus() {
-      statusEl.style.display = "none";
-    }
-
-    function renderWarnings(warnings) {
-      if (!warnings || warnings.length === 0) {
-        warningsEl.style.display = "none";
-        return;
+      function setStatus(type, message) {
+        statusEl.className = type;
+        statusEl.textContent = message;
+        statusEl.style.display = "block";
       }
 
-      warningsListEl.innerHTML = warnings
-        .map((w) => `<li>${escapeHtml(w)}</li>`)
-        .join("");
-      warningsEl.style.display = "block";
-    }
-
-    function hideWarnings() {
-      warningsEl.style.display = "none";
-      warningsListEl.innerHTML = "";
-    }
-
-    function escapeHtml(text) {
-      const div = document.createElement("div");
-      div.textContent = text;
-      return div.innerHTML;
-    }
-
-    function onTestSSE() {
-      const serverUrl =
-        document.getElementById("serverUrl").value.trim() ||
-        "http://localhost:3000";
-      const testUrl = serverUrl.replace(/\/compile\/?$/, "") + "/compile/echo-sse";
-
-      console.log("[D2C UI] Testing EventSource:", testUrl);
-      setStatus("loading", "Connecting EventSource test stream...");
-
-      const es = new EventSource(testUrl);
-      let lastEventAt = Date.now();
-      let eventCount = 0;
-
-      es.onopen = () => {
-        console.log("[D2C UI] EventSource opened");
-      };
-
-      const handleTestEvent = (eventName, data) => {
-        eventCount++;
-        lastEventAt = Date.now();
-        console.log("[D2C UI] EventSource " + eventName + " #" + eventCount + ":", data);
-
-        if (data.message) {
-          setStatus("loading", "SSE test: " + data.message + " (#" + eventCount + ")");
-        } else if (data.chars !== undefined) {
-          setStatus("loading", "SSE test: " + data.chars + " chars (#" + eventCount + ")");
-        } else if (data.success) {
-          setStatus("success", "SSE test survived 60s! (" + eventCount + " events)");
-          es.close();
-        }
-      };
-
-      es.addEventListener("status", (e) => handleTestEvent("status", JSON.parse(e.data)));
-      es.addEventListener("token", (e) => handleTestEvent("token", JSON.parse(e.data)));
-      es.addEventListener("done", (e) => handleTestEvent("done", JSON.parse(e.data)));
-
-      es.onerror = (e) => {
-        setTimeout(() => {
-          const elapsed = Date.now() - lastEventAt;
-          console.error("[D2C UI] EventSource error after", elapsed, "ms", e);
-          setStatus(
-            "error",
-            "EventSource failed after " + elapsed + "ms (" + eventCount + " events received)",
-          );
-          es.close();
-        }, 500);
-      };
-    }
-
-    function onGenerate() {
-      const repoPath = document.getElementById("repoPath").value.trim();
-      const includeScreenshot = document.getElementById("includeScreenshot").checked;
-      const framework = document.getElementById("framework").value;
-      console.log("[D2C UI] Generate clicked. Repo:", repoPath, "| Screenshot:", includeScreenshot, "| Framework:", framework);
-
-      if (!repoPath) {
-        setStatus("error", "Please enter a client repository path.");
-        return;
+      function hideStatus() {
+        statusEl.style.display = "none";
       }
 
-      generateBtn.disabled = true;
-      hideWarnings();
-      setStatus("loading", includeScreenshot ? "Extracting design + screenshot..." : "Extracting design data...");
-
-      parent.postMessage(
-        { pluginMessage: { type: "generate", clientRepoPath: repoPath, includeScreenshot: includeScreenshot, framework: framework } },
-        "*"
-      );
-    }
-
-    window.onmessage = async (event) => {
-      const msg = event.data.pluginMessage;
-      if (!msg) return;
-
-      console.log("[D2C UI] Received message:", msg.type);
-
-      switch (msg.type) {
-        case "status":
-          console.log("[D2C UI] Status:", msg.message);
-          setStatus("loading", msg.message);
-          break;
-
-        case "error":
-          console.error("[D2C UI] Error:", msg.message);
-          setStatus("error", msg.message);
-          generateBtn.disabled = false;
-          break;
-
-        case "compile":
-          console.log("[D2C UI] Blueprint size:", msg.penBlueprint.length, "chars | Screenshot:", msg.screenshotBase64 ? msg.screenshotBase64.length : "skipped");
-          setStatus("loading", "Sending to bridge server...");
-          await sendToBridge(msg);
-          break;
-      }
-    };
-
-    async function sendToBridge(msg) {
-      const serverUrl =
-        document.getElementById("serverUrl").value.trim() ||
-        "http://localhost:3000/compile";
-      const baseUrl = serverUrl.replace(/\/compile\/?$/, "");
-      const startUrl = baseUrl + "/compile/start";
-      const streamUrlBase = baseUrl + "/compile/stream/";
-
-      console.log("[D2C UI] POSTing to:", startUrl);
-
-      let currentStatus = "Generating code...";
-      let currentChars = 0;
-      let finalResult = null;
-
-      function updateLoadingStatus() {
-        setStatus(
-          "loading",
-          currentChars > 0
-            ? `${currentStatus} (${currentChars.toLocaleString()} chars)`
-            : currentStatus,
-        );
-      }
-
-      try {
-        const body = {
-          clientRepoPath: msg.clientRepoPath,
-          penBlueprint: JSON.parse(msg.penBlueprint),
-          framework: msg.framework || "auto",
-        };
-        if (msg.screenshotBase64) {
-          body.screenshotBase64 = msg.screenshotBase64;
-        }
-
-        const startResponse = await fetch(startUrl, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(body),
-        });
-
-        console.log("[D2C UI] start response:", {
-          status: startResponse.status,
-          statusText: startResponse.statusText,
-        });
-
-        if (!startResponse.ok) {
-          const text = await startResponse.text();
-          let errorMessage = `Server error: ${startResponse.status}`;
-          try {
-            const result = JSON.parse(text);
-            errorMessage = result.error || result.message || errorMessage;
-          } catch (e) {
-            // ignore parse error
-          }
-          setStatus("error", errorMessage);
-          generateBtn.disabled = false;
+      function renderWarnings(warnings) {
+        if (!warnings || warnings.length === 0) {
+          warningsEl.style.display = "none";
           return;
         }
 
-        const { jobId } = await startResponse.json();
-        console.log("[D2C UI] Job started:", jobId);
+        warningsListEl.innerHTML = warnings
+          .map((w) => `<li>${escapeHtml(w)}</li>`)
+          .join("");
+        warningsEl.style.display = "block";
+      }
 
-        currentStatus = "Connected. Waiting for model...";
-        updateLoadingStatus();
+      function hideWarnings() {
+        warningsEl.style.display = "none";
+        warningsListEl.innerHTML = "";
+      }
 
-        const streamUrl = streamUrlBase + jobId;
-        console.log("[D2C UI] Connecting EventSource:", streamUrl);
+      function escapeHtml(text) {
+        const div = document.createElement("div");
+        div.textContent = text;
+        return div.innerHTML;
+      }
 
-        const es = new EventSource(streamUrl);
+      function onTestSSE() {
+        const serverUrl =
+          document.getElementById("serverUrl").value.trim() ||
+          "http://localhost:3000";
+        const testUrl =
+          serverUrl.replace(/\/compile\/?$/, "") + "/compile/echo-sse";
+
+        console.log("[D2C UI] Testing EventSource:", testUrl);
+        setStatus("loading", "Connecting EventSource test stream...");
+
+        const es = new EventSource(testUrl);
         let lastEventAt = Date.now();
         let eventCount = 0;
 
-        const handleEvent = (eventName, data) => {
+        es.onopen = () => {
+          console.log("[D2C UI] EventSource opened");
+        };
+
+        const handleTestEvent = (eventName, data) => {
           eventCount++;
           lastEventAt = Date.now();
-          console.log(`[D2C UI] EventSource '${eventName}':`, data);
+          console.log(
+            "[D2C UI] EventSource " + eventName + " #" + eventCount + ":",
+            data,
+          );
 
-          switch (eventName) {
-            case "status":
-              currentStatus = data.message || currentStatus;
-              updateLoadingStatus();
-              break;
+          if (data.message) {
+            setStatus(
+              "loading",
+              "SSE test: " + data.message + " (#" + eventCount + ")",
+            );
+          } else if (data.chars !== undefined) {
+            setStatus(
+              "loading",
+              "SSE test: " + data.chars + " chars (#" + eventCount + ")",
+            );
+          } else if (data.success) {
+            setStatus(
+              "success",
+              "SSE test survived 60s! (" + eventCount + " events)",
+            );
+            es.close();
+          }
+        };
 
-            case "token":
-              currentChars = data.chars || currentChars;
-              updateLoadingStatus();
-              break;
+        es.addEventListener("status", (e) =>
+          handleTestEvent("status", JSON.parse(e.data)),
+        );
+        es.addEventListener("token", (e) =>
+          handleTestEvent("token", JSON.parse(e.data)),
+        );
+        es.addEventListener("done", (e) =>
+          handleTestEvent("done", JSON.parse(e.data)),
+        );
+
+        es.onerror = (e) => {
+          setTimeout(() => {
+            const elapsed = Date.now() - lastEventAt;
+            console.error("[D2C UI] EventSource error after", elapsed, "ms", e);
+            setStatus(
+              "error",
+              "EventSource failed after " +
+                elapsed +
+                "ms (" +
+                eventCount +
+                " events received)",
+            );
+            es.close();
+          }, 500);
+        };
+      }
+
+      function onGenerate() {
+        const repoPath = document.getElementById("repoPath").value.trim();
+        const includeScreenshot =
+          document.getElementById("includeScreenshot").checked;
+        const framework = document.getElementById("framework").value;
+        console.log(
+          "[D2C UI] Generate clicked. Repo:",
+          repoPath,
+          "| Screenshot:",
+          includeScreenshot,
+          "| Framework:",
+          framework,
+        );
+
+        if (!repoPath) {
+          setStatus("error", "Please enter a client repository path.");
+          return;
+        }
+
+        generateBtn.disabled = true;
+        hideWarnings();
+        setStatus(
+          "loading",
+          includeScreenshot
+            ? "Extracting design + screenshot..."
+            : "Extracting design data...",
+        );
+
+        parent.postMessage(
+          {
+            pluginMessage: {
+              type: "generate",
+              clientRepoPath: repoPath,
+              includeScreenshot: includeScreenshot,
+              framework: framework,
+            },
+          },
+          "*",
+        );
+      }
+
+      window.onmessage = async (event) => {
+        const msg = event.data.pluginMessage;
+        if (!msg) return;
+
+        console.log("[D2C UI] Received message:", msg.type);
+
+        switch (msg.type) {
+          case "status":
+            console.log("[D2C UI] Status:", msg.message);
+            setStatus("loading", msg.message);
+            break;
+
+          case "error":
+            console.error("[D2C UI] Error:", msg.message);
+            setStatus("error", msg.message);
+            generateBtn.disabled = false;
+            break;
+
+          case "compile":
+            console.log(
+              "[D2C UI] Blueprint size:",
+              msg.penBlueprint.length,
+              "chars | Screenshot:",
+              msg.screenshotBase64 ? msg.screenshotBase64.length : "skipped",
+            );
+            setStatus("loading", "Sending to bridge server...");
+            await sendToBridge(msg);
+            break;
+        }
+      };
+
+      async function sendToBridge(msg) {
+        const serverUrl =
+          document.getElementById("serverUrl").value.trim() ||
+          "http://localhost:3000/compile";
+        const baseUrl = serverUrl.replace(/\/compile\/?$/, "");
+        const startUrl = baseUrl + "/compile/start";
+        const streamUrlBase = baseUrl + "/compile/stream/";
+
+        console.log("[D2C UI] POSTing to:", startUrl);
+
+      let currentStatus = "Generating code...";
+      let currentChars = 0;
+      let currentTokens = 0;
+      let finalResult = null;
+
+      function updateLoadingStatus() {
+        const parts = [currentStatus];
+        if (currentChars > 0) {
+          parts.push(`${currentChars.toLocaleString()} chars`);
+        }
+        if (currentTokens > 0) {
+          parts.push(`${currentTokens.toLocaleString()} tokens`);
+        }
+        setStatus("loading", parts.join(" — "));
+      }
+
+        try {
+          const body = {
+            clientRepoPath: msg.clientRepoPath,
+            penBlueprint: JSON.parse(msg.penBlueprint),
+            framework: msg.framework || "auto",
+          };
+          if (msg.screenshotBase64) {
+            body.screenshotBase64 = msg.screenshotBase64;
+          }
+
+          const startResponse = await fetch(startUrl, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(body),
+          });
+
+          console.log("[D2C UI] start response:", {
+            status: startResponse.status,
+            statusText: startResponse.statusText,
+          });
+
+          if (!startResponse.ok) {
+            const text = await startResponse.text();
+            let errorMessage = `Server error: ${startResponse.status}`;
+            try {
+              const result = JSON.parse(text);
+              errorMessage = result.error || result.message || errorMessage;
+            } catch (e) {
+              // ignore parse error
+            }
+            setStatus("error", errorMessage);
+            generateBtn.disabled = false;
+            return;
+          }
+
+          const { jobId } = await startResponse.json();
+          console.log("[D2C UI] Job started:", jobId);
+
+          currentStatus = "Connected. Waiting for model...";
+          updateLoadingStatus();
+
+          const streamUrl = streamUrlBase + jobId;
+          console.log("[D2C UI] Connecting EventSource:", streamUrl);
+
+          const es = new EventSource(streamUrl);
+          let lastEventAt = Date.now();
+          let eventCount = 0;
+
+          const handleEvent = (eventName, data) => {
+            eventCount++;
+            lastEventAt = Date.now();
+            console.log(`[D2C UI] EventSource '${eventName}':`, data);
+
+            switch (eventName) {
+              case "status":
+                currentStatus = data.message || currentStatus;
+                updateLoadingStatus();
+                break;
+
+              case "token":
+                currentChars = data.chars || currentChars;
+                currentTokens = data.totalTokens || currentTokens;
+                updateLoadingStatus();
+                break;
 
             case "turn-complete":
               currentStatus = `Turn ${data.turn} complete — ${data.filesSoFar} file(s)`;
+              currentTokens = data.totalTokens || currentTokens;
               updateLoadingStatus();
               break;
 
-            case "files-written":
-              currentStatus = `Wrote ${data.count} file(s)`;
-              updateLoadingStatus();
-              break;
+              case "files-written":
+                currentStatus = `Wrote ${data.count} file(s)`;
+                updateLoadingStatus();
+                break;
 
-            case "warnings":
-              renderWarnings(data.messages);
-              break;
+              case "warnings":
+                renderWarnings(data.messages);
+                break;
 
             case "done":
               finalResult = data;
               if (finalResult.success) {
                 console.log("[D2C UI] Final result:", finalResult);
+                const tokenSummary = finalResult.totalTokens
+                  ? ` (${finalResult.totalTokens.toLocaleString()} tokens)`
+                  : "";
                 setStatus(
                   "success",
-                  `Generated ${finalResult.count} file(s):\n${finalResult.filesWritten
+                  `Generated ${finalResult.count} file(s)${tokenSummary}:\n${finalResult.filesWritten
                     .map((f) => "  - " + f)
                     .join("\n")}`,
                 );
@@ -479,51 +544,68 @@
                 es.close();
               }
               break;
-          }
-        };
-
-        es.addEventListener("status", (e) => handleEvent("status", JSON.parse(e.data)));
-        es.addEventListener("token", (e) => handleEvent("token", JSON.parse(e.data)));
-        es.addEventListener("turn-complete", (e) => handleEvent("turn-complete", JSON.parse(e.data)));
-        es.addEventListener("files-written", (e) => handleEvent("files-written", JSON.parse(e.data)));
-        es.addEventListener("warnings", (e) => handleEvent("warnings", JSON.parse(e.data)));
-        es.addEventListener("done", (e) => handleEvent("done", JSON.parse(e.data)));
-        es.addEventListener("error", (e) => {
-          // EventSource fires generic error events when connection closes.
-          // Wait briefly to see if a 'done' event already set finalResult.
-          setTimeout(() => {
-            if (finalResult && finalResult.success) {
-              console.log("[D2C UI] Stream closed after successful done");
-              return;
             }
-            const elapsed = Date.now() - lastEventAt;
-            let errorMessage = `Stream error after ${elapsed}ms (${eventCount} events received)`;
-            try {
-              const data = JSON.parse(e.data);
-              errorMessage = data.message || data.error || errorMessage;
-            } catch (parseErr) {
-              // ignore parse error
-            }
-            console.error("[D2C UI] EventSource error after", elapsed, "ms", e);
-            setStatus("error", errorMessage);
-            generateBtn.disabled = false;
-            es.close();
-          }, 500);
-        });
+          };
 
-        es.onopen = () => {
-          console.log("[D2C UI] EventSource opened");
-        };
-      } catch (err) {
-        console.error("[D2C UI] Compile error:", err);
-        console.error("[D2C UI] Error stack:", err.stack);
-        setStatus(
-          "error",
-          err.message || "Failed to connect to bridge server. Is it running?",
-        );
-        generateBtn.disabled = false;
+          es.addEventListener("status", (e) =>
+            handleEvent("status", JSON.parse(e.data)),
+          );
+          es.addEventListener("token", (e) =>
+            handleEvent("token", JSON.parse(e.data)),
+          );
+          es.addEventListener("turn-complete", (e) =>
+            handleEvent("turn-complete", JSON.parse(e.data)),
+          );
+          es.addEventListener("files-written", (e) =>
+            handleEvent("files-written", JSON.parse(e.data)),
+          );
+          es.addEventListener("warnings", (e) =>
+            handleEvent("warnings", JSON.parse(e.data)),
+          );
+          es.addEventListener("done", (e) =>
+            handleEvent("done", JSON.parse(e.data)),
+          );
+          es.addEventListener("error", (e) => {
+            // EventSource fires generic error events when connection closes.
+            // Wait briefly to see if a 'done' event already set finalResult.
+            setTimeout(() => {
+              if (finalResult && finalResult.success) {
+                console.log("[D2C UI] Stream closed after successful done");
+                return;
+              }
+              const elapsed = Date.now() - lastEventAt;
+              let errorMessage = `Stream error after ${elapsed}ms (${eventCount} events received)`;
+              try {
+                const data = JSON.parse(e.data);
+                errorMessage = data.message || data.error || errorMessage;
+              } catch (parseErr) {
+                // ignore parse error
+              }
+              console.error(
+                "[D2C UI] EventSource error after",
+                elapsed,
+                "ms",
+                e,
+              );
+              setStatus("error", errorMessage);
+              generateBtn.disabled = false;
+              es.close();
+            }, 500);
+          });
+
+          es.onopen = () => {
+            console.log("[D2C UI] EventSource opened");
+          };
+        } catch (err) {
+          console.error("[D2C UI] Compile error:", err);
+          console.error("[D2C UI] Error stack:", err.stack);
+          setStatus(
+            "error",
+            err.message || "Failed to connect to bridge server. Is it running?",
+          );
+          generateBtn.disabled = false;
+        }
       }
-    }
-  </script>
-</body>
+    </script>
+  </body>
 </html>
